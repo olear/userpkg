@@ -1,0 +1,32 @@
+UserPKG
+========
+
+Unprivileged package manager.
+
+Install
+=======
+
+libDracoPKG is only common on DracoLinux, include a static pkgsrc-only version:
+```
+wget https://github.com/dracolinux/DracoPKG/archive/<LATEST_VERSION>.tar.gz
+tar xvf <LATEST_VERSION>.tar.gz && cd DracoPKG-<LATEST_VERSION>/lib
+qmake PREFIX=$(pwd)/../../DracoPKG CONFIG+=libpkgsrc CONFIG+=staticlib
+make install
+cd ../../
+```
+
+```
+qmake PREFIX=/usr
+make install
+```
+
+License
+=======
+
+Copyright (c) 2014 Ole Andre Rodlie <olear@dracolinux.org>. All rights reserved.
+
+UserPKG is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License version 2.
+
+UserPKG is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+You should have received a copy of the GNU General Public License version 2 along with UserPKG.  If not, see <http://www.gnu.org/licenses/>.

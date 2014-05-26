@@ -1,0 +1,32 @@
+1.0alpha10
+- move to libPkgSrc since the libDracoPKG split.
+1.0alpha9
+- Moved last existing functions to libDracoPKG.
+1.0alpha7
+- Moved more functions to libDracoPKG
+- Bootstrap fixes
+1.0alpha6
+- Moved more functions to libDracoPKG
+- Added package search (about time :P )
+1.0alpha5
+- UI changes
+- Migrated more functions to libDracoPKG
+1.0alpha4
+- Reverted to tabs from alpha1
+- Migrated pkgsrcDownload, bootstrap and queue to libDracoPKG
+- added build status in queue view
+
+
+Released 1.0alpha1
+
+Improved logging functions, added pkgversion to installed packages list, added pkgversion, pkgname, pkgdepends to pkg description, removed installed/queued packages from pkglist. Minor code cleanup. Identify pkgsrc branch.
+
+Released 0.1pre8: Fixed minor issue with desktop integration, added new (and better) clean function.
+
+Released 0.1pre7: Desktop integration, minor fixes.
+
+Released 0.1pre5: Clean after build, systray support, major UI changes.
+
+Released 0.1pre4: Added Queue, minor UI changes.
+
+Released 0.1pre2: fixes a compatibility issue with Debian/Ubuntu (Dash is not BSD-compatible, use Bash). 
