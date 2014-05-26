@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/files">
+        <file>add.png</file>
+        <file>folder.png</file>
+        <file>package.png</file>
+        <file>remove.png</file>
+        <file>queue-add.png</file>
+        <file>queue-busy.png</file>
+        <file>queue-done.png</file>
+        <file>queue-error.png</file>
+        <file>queue-package.png</file>
+        <file>queue-pending.png</file>
+        <file>queue-start.png</file>
+        <file>tray.png</file>
+    </qresource>
+</RCC>

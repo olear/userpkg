@@ -1,4 +1,1 @@
-UserPKG
-=======
-
-Unprivileged package manager
+doc/README

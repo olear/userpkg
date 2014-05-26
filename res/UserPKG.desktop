@@ -1,0 +1,14 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Unprivileged package manager
+Comment=Install package from source in your home folder
+GenericName=Package manager
+Exec=UserPKG
+Icon=UserPKG
+Terminal=false
+StartupNotify=true
+Type=Application
+Categories=Application;System;Utility;Core;;
+
+# vi:set encoding=UTF-8:
+X-Desktop-File-Install-Version=0.15
