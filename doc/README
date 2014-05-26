@@ -16,7 +16,7 @@ cd ../../
 ```
 
 ```
-qmake PREFIX=/usr
+qmake PREFIX=/usr CONFIG+=libpkgsrc
 make install
 ```
 
