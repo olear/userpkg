@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Installer>
+	<Name>UserPKG</Name>
+	<Version>20140525</Version>
+	<Title>UserPKG</Title>
+	<Publisher>DracoLinux</Publisher>
+	<StartMenuDir>UserPKG</StartMenuDir>
+	<ProductUrl>http://userpkg.dracolinux.org</ProductUrl>
+	<RunProgram>@TargetDir@/UserPKG</RunProgram>
+	<UninstallerName>MaintenanceTool</UninstallerName>
+	<InstallerWindowIcon>icon.png</InstallerWindowIcon>
+	<Logo>logo.png</Logo>
+	<Watermark>watermark.png</Watermark>
+        <AdminTargetDir>/opt/UserPKG</AdminTargetDir>
+	<TargetDir>@HomeDir@/UserPKG</TargetDir>
+	<RemoteRepositories>
+		<Repository>
+			<Url>http://userpkg.dracolinux.org/linux64</Url>
+			<Enabled>1</Enabled>
+		</Repository>
+	</RemoteRepositories>
+</Installer>
+
