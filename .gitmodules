@@ -1,0 +1,3 @@
+[submodule "DracoPKG"]
+	path = DracoPKG
+	url = git://github.com/dracolinux/DracoPKG.git

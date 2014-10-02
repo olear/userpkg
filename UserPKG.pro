@@ -50,8 +50,8 @@ QMAKE_CLEAN                         += -r $${DESTDIR} Makefile
 INCLUDEPATH                         += "$${INCLUDEDIR}"
 LIBS                                += -L"$${PREFIX}/lib$${LIBSUFFIX}"
 
-INCLUDEPATH+="$${_PRO_FILE_PWD_}/DracoPKG/include"
-LIBS+=-L"$${_PRO_FILE_PWD_}/DracoPKG/lib"
+INCLUDEPATH+="$${_PRO_FILE_PWD_}/DracoPKG/build/include"
+LIBS+=-L"$${_PRO_FILE_PWD_}/DracoPKG/build/lib"
 
 CONFIG(libpkgsrc) {
 LIBS                                += "-lPkgSrc"

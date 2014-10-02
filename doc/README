@@ -1,23 +1,34 @@
 UserPKG
 ========
 
-Unprivileged package manager.
+Unprivileged package manager for Linux and NetBSD.
+
+UserPKG is a convenient front-end for pkgsrc, simplifiying the installation and usage of third-party software for users.
+
+Requirements
+============
+
+* Linux/NetBSD
+* Build essentials
+
+Status
+======
+
+Early Alpha.
+
 
 Install
 =======
 
-libDracoPKG is only common on DracoLinux, include a static pkgsrc-only version:
-```
-wget https://github.com/dracolinux/DracoPKG/archive/<LATEST_VERSION>.tar.gz
-tar xvf <LATEST_VERSION>.tar.gz && cd DracoPKG-<LATEST_VERSION>/lib
-qmake PREFIX=$(pwd)/../../DracoPKG CONFIG+=libpkgsrc CONFIG+=staticlib
-make install
-cd ../../
-```
+Download latest release for Linux/NetBSD, or build you own.
+
+Build
+=====
 
 ```
-qmake PREFIX=/usr CONFIG+=libpkgsrc
-make install
+git submodule update -i
+cd DracoPKG/lib ; qmake CONFIG+=libpkgsrc CONFIG+=staticlib PREFIX=$(pwd)/../build  && make install
+cd ../../ ; qmake PREFIX=/usr CONFIG+=libpkgsrc && make install
 ```
 
 License

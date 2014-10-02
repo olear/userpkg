@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>UserPKG</DisplayName>
+    <Description>Unprivileged package manager</Description>
+    <Version>20140525</Version>
+    <ReleaseDate>2014-10-02</ReleaseDate>
+    <Name>org.dracolinux.userpkg</Name>
+    <Licenses>
+        <License name="UserPKG" file="license.txt" />
+    </Licenses>
+    <SortingPriority>123456789</SortingPriority>
+    <Default>script</Default>
+    <Script>installscript.qs</Script>
+</Package>
+
