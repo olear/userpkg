@@ -1,5 +1,6 @@
 UserPKG
-========
+=======
+![alt logo](https://raw.githubusercontent.com/dracolinux/UserPKG/master/res/hicolor/48x48/UserPKG.png)
 
 Unprivileged package manager for Linux and NetBSD.
 
@@ -9,6 +10,10 @@ Requirements
 ============
 
 * Linux/NetBSD
+ * Tested on DracoLinux
+ * Tested on CentOS/RHEL 6
+ * Tested on Ubuntu 14.04
+ * Tested on NetBSD 6.1
 * Build essentials
 
 Status
@@ -16,14 +21,15 @@ Status
 
 Early Alpha.
 
-
 Install
 =======
 
-Download latest release for Linux/NetBSD, or build you own.
+Download latest release for Linux ([setup](https://github.com/dracolinux/UserPKG/releases/download/20140525/UserPKG-20140525-Linux64-Setup.tgz)|binary)/NetBSD, or build you own.
 
 Build
 =====
+
+Requires Qt4 development files installed prior to building UserPKG.
 
 ```
 git submodule update -i
@@ -35,6 +41,7 @@ License
 =======
 
 Copyright (c) 2014 Ole Andre Rodlie <olear@dracolinux.org>. All rights reserved.
+Copyright (c) 2014 FxArena DA <mail@fxarena.net>. All rights reserved.
 
 UserPKG is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License version 2.
 
