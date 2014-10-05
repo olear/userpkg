@@ -6,6 +6,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    QTimer::singleShot(0,this,SLOT(initApp()));
+}
+
+void MainWindow::initApp()
+{
+
     ui->statusBar->addPermanentWidget(ui->progressBar);
     ui->progressBar->hide();
     //ui->pkg->setUniformItemSizes(true);
@@ -14,6 +20,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->queue->setHeaderHidden(false);
 
     tray = new QSystemTrayIcon(this);
+
+    timer.start(); // get a time reference
 
     connect(&pkgsrc,SIGNAL(packageOptionsResult(QStringList)),this,SLOT(packageOptions(QStringList)));
     connect(&pkgsrc,SIGNAL(downloadFinished(int)),this,SLOT(pkgsrcDownloadFinished(int)));
@@ -55,6 +63,12 @@ MainWindow::MainWindow(QWidget *parent) :
     if (tray->isSystemTrayAvailable())
     {
         tray->show();
+    }
+    if (tray->isVisible()) {
+        for (int i = 0; i < QApplication::arguments().size(); ++i) {
+            if (QApplication::arguments().at(i).contains("--tray"))
+                this->hide();
+        }
     }
 }
 
@@ -122,6 +136,7 @@ void MainWindow::genPkgList(QString cat)
         QString value = packages.at(i);
         QString package;
         QString category;
+        QString desc;
         if (value.contains("|"))
         {
             QStringList values = value.split("|",QString::SkipEmptyParts);
@@ -131,6 +146,9 @@ void MainWindow::genPkgList(QString cat)
                 if (!values.isEmpty())
                 {
                     package = values.takeFirst();
+                }
+                if (!values.isEmpty()) {
+                    desc = values.takeFirst();
                 }
             }
         }
@@ -157,10 +175,8 @@ void MainWindow::genPkgList(QString cat)
                     }
                 }
 
-            /*if (!category.isEmpty())
-            { // old lost feature from pre1, add description
-                newItem->setData(3,category);
-            }*/
+            if (!desc.isEmpty())
+                newItem->setData(3,desc);
 
                 ui->pkg->addItem(newItem);
             }
@@ -246,6 +262,7 @@ void MainWindow::on_options_itemActivated(QTreeWidgetItem *item)
     }
 }
 
+/*
 void MainWindow::installedPackagesGenTree()
 {
     ui->installedPackagesTree->clear();
@@ -267,6 +284,7 @@ void MainWindow::installedPackagesGenTree()
         }
     }
 }
+*/
 
 void MainWindow::pkgsrcInstalledFinished(QStringList packages)
 {
@@ -327,7 +345,7 @@ void MainWindow::on_actionQuit_triggered()
 
 void MainWindow::on_actionAbout_triggered()
 {
-    QMessageBox::about(this,"About UserPKG "+QApplication::applicationVersion(),"<h3>UserPKG "+QApplication::applicationVersion()+"</h3>Unprivileged package manager.<br><br>UserPKG Copyright &copy; 2014 Ole Andre Rodlie. All rights reserved.<br>UserPKG Copyright &copy; 2014 FxArena DA. All rights reserved.<br><br>UserPKG is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License version 2.<br><br>UserPKG is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.<br><br>You should have received a copy of the GNU General Public License version 2 along with UserPKG.  If not, see http://www.gnu.org/licenses/.<br><br>Visit <a href='http://dracolinux.org'>DracoLinux.org</a> for more information. Comments, bugs etc goes to <a href='mailto:olear@dracolinux.org'>olear@dracolinux.org</a>.");
+    QMessageBox::about(this,"About UserPKG "+QApplication::applicationVersion(),"<h3>UserPKG "+QApplication::applicationVersion()+"</h3>Unprivileged package manager.<br><br>UserPKG Copyright &copy; 2014 Ole Andre Rodlie. All rights reserved.<br>UserPKG Copyright &copy; 2014 FxArena DA. All rights reserved.<br><br>UserPKG is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License version 2.<br><br>UserPKG is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.<br><br>You should have received a copy of the GNU General Public License version 2 along with UserPKG.  If not, see http://www.gnu.org/licenses/.<br><br>Visit <a href='http://dracolinux.org'>DracoLinux.org</a> for more information. Comments, bugs etc goes to <a href='mailto:olear@dracolinux.org'>olear@dracolinux.org</a>.<br><br>Uptime: "+QString::number(timer.elapsed()));
 }
 
 void MainWindow::on_actionAbout_pkgsrc_triggered()
@@ -492,7 +510,7 @@ bool MainWindow::bootstrapCheck()
             userBashProfile.close();
             if (tray->isVisible())
             {
-                tray->showMessage("Profile modified","Modified your bash_profile, you must logout to apply modifications later");
+                tray->showMessage("Profile modified","Modified your bash profile, you shoild logout to apply modifications");
             }
         }
     }
@@ -505,7 +523,7 @@ bool MainWindow::bootstrapCheck()
         }
         if (tray->isVisible())
         {
-            tray->showMessage("Profile modified","Modified your bash_profile, you must logout to apply modifications later");
+            tray->showMessage("Profile modified","Modified your bash profile, you should logout to apply modifications");
         }
     }
     userBashProfile.close();
@@ -651,7 +669,8 @@ void MainWindow::bootstrapMakeFinished(int status)
         ui->statusBar->showMessage("Bootstrapping done, you should now logout to apply desktop integration");
         pkgsrc.packageCleanRequest();
         catGen();
-        installedPackagesGenTree();
+        //installedPackagesGenTree();
+        pkgsrc.packagesInstalledRequest();
     }
     else
     {
@@ -771,7 +790,7 @@ void MainWindow::queueStart()
 void MainWindow::queueStop()
 {
     if (pkgsrc.bmakeStop())
-        ui->queue->clear();
+        ui->queue->clear(); // not a good solution, mark as new or error on stop
     //queue->close();
     /*ui->progressBar->setMaximum(100);
     ui->progressBar->setValue(0);
@@ -833,8 +852,9 @@ void MainWindow::queueFinished(int status)
         ui->progressBar->setValue(0);
         if (!ui->progressBar->isHidden())
             ui->progressBar->hide();
-        installedPackagesGenTree();
+        //installedPackagesGenTree();
         //pkgsrcPkgVulnCheckExec();
+        pkgsrc.packagesInstalledRequest();
         pkgsrc.packagesVulnsRequest();
 
         // Make pretty log for debugging
@@ -1069,6 +1089,7 @@ void MainWindow::pkgsrcPkgVulnCheckFinished(QStringList result)
 {
     if (!result.isEmpty())
     {
+        int oldVulns = ui->pkgVuln->topLevelItemCount();
         ui->pkgVuln->clear();
         for (int i = 0; i < result.size(); ++i)
         {
@@ -1091,6 +1112,12 @@ void MainWindow::pkgsrcPkgVulnCheckFinished(QStringList result)
                 item->setIcon(0,QIcon(":/files/queue-package.png"));
                 ui->pkgVuln->addTopLevelItem(item);
             }
+        }
+        int newVulns = ui->pkgVuln->topLevelItemCount();
+        if (newVulns>oldVulns) {
+            if(tray->isVisible())
+                tray->showMessage("Security Alert","Vulnerabilites found!");
+            ui->statusBar->showMessage("Vulnerabilites found!");
         }
     }
 }

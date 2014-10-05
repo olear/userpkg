@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>645</width>
-    <height>350</height>
+    <height>364</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,7 +25,7 @@
        <enum>QTabWidget::South</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="packagesTab">
        <attribute name="title">
@@ -137,7 +137,7 @@
                  <x>0</x>
                  <y>0</y>
                  <width>230</width>
-                 <height>73</height>
+                 <height>80</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -218,8 +218,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>96</width>
-                 <height>93</height>
+                 <width>102</width>
+                 <height>102</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -245,8 +245,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>96</width>
-                 <height>93</height>
+                 <width>102</width>
+                 <height>102</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -372,6 +372,19 @@
           </column>
          </widget>
         </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="tab_4">
@@ -409,7 +422,7 @@
              <x>0</x>
              <y>0</y>
              <width>605</width>
-             <height>147</height>
+             <height>155</height>
             </rect>
            </property>
            <attribute name="label">
@@ -561,8 +574,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>96</width>
-             <height>93</height>
+             <width>102</width>
+             <height>102</height>
             </rect>
            </property>
            <attribute name="label">
@@ -646,6 +659,46 @@
              </widget>
             </item>
            </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="settingsTab">
+       <attribute name="title">
+        <string>Settings</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_6">
+        <item>
+         <widget class="QToolBox" name="toolBox_2">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="page_3">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>605</width>
+             <height>155</height>
+            </rect>
+           </property>
+           <attribute name="label">
+            <string>General</string>
+           </attribute>
+          </widget>
+          <widget class="QWidget" name="page_4">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>605</width>
+             <height>155</height>
+            </rect>
+           </property>
+           <attribute name="label">
+            <string>Advanced</string>
+           </attribute>
           </widget>
          </widget>
         </item>
