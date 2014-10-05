@@ -93,6 +93,16 @@ private slots:
     void pkgsrcSyncLog(QString log);
     void pkgsrcSyncDone(int status);
 
+    void readMKconf();
+    void saveMKconf();
+
+    void on_mkconfSave_clicked();
+
+    void on_mkconfUndo_clicked();
+    void queueRowUp();
+    void queueRowDown();
+
+    void checkUpdates();
 private:
     Ui::MainWindow *ui;
     PkgSrc pkgsrc;

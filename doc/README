@@ -4,16 +4,13 @@ UserPKG
 
 Unprivileged package manager for Linux and NetBSD.
 
-UserPKG is a convenient front-end for pkgsrc, simplifiying the installation and usage of third-party software. No administrator access needed,
+UserPKG is a convenient front-end for pkgsrc, simplifiying the installation and usage of third-party software. No administrator access needed.
 
 Requirements
 ============
 
-* Linux/NetBSD
- * Tested on DracoLinux
- * Tested on CentOS/RHEL 6
- * Tested on Ubuntu 14.04
- * Tested on NetBSD 6.1
+* Linux
+* NetBSD
 * Build essentials
 
 Status
@@ -27,30 +24,27 @@ Roadmap/TODO
 * Check for cvs, if not build.
 * Better feedback on pkgsrc sync
 * Switch pkgsrc branch
-* Disable ui when checking for depends/options
-* Switch pkgsrc branch
-* Check for updates
-* move up/down queue
-* pause/stop/restart queue
+* Check for updates (and list them, and offer to add to queue as update action)
+* pause/stop/restart queue (stop works)
 * better feedback on build
 * save/restore ui
-* settings
+* settings (basic support added)
 * startup wizard
-* major code cleanup
-* move to SysPKG
-* dbus client
-* binary pkg support
+* major code cleanup (v1rc2)
+* dbus client (v1+)
+* binary pkg support (v2+)
 * add action support to queue
+* add windows/mingw support (v2+)
 
 Install
 =======
 
-Download latest release for Linux ([setup](https://github.com/dracolinux/UserPKG/releases/download/20140525/UserPKG-20140525-Linux64-Setup.tgz)|binary)/NetBSD, or build you own.
+Download latest release for Linux/NetBSD, or build you own.
 
 Build
 =====
 
-Requires Qt4 development files installed prior to building UserPKG.
+Requires Qt (4.6+) development files installed prior to building UserPKG.
 
 ```
 git submodule update -i

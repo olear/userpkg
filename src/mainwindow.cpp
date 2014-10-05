@@ -19,6 +19,8 @@ void MainWindow::initApp()
     ui->pushButton->setEnabled(false);
     ui->queue->setHeaderHidden(false);
 
+    //ui->pkg->setViewMode(QListView::IconMode);
+
     tray = new QSystemTrayIcon(this);
 
     timer.start(); // get a time reference
@@ -70,19 +72,15 @@ void MainWindow::initApp()
                 this->hide();
         }
     }
+    readMKconf();
 }
 
 void MainWindow::trayActivated()
 {
         if(this->isHidden())
-        {
             this->show();
-        }
         else
-        {
             this->hide();
-
-        }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -131,6 +129,7 @@ void MainWindow::genPkgList(QString cat)
 {
     ui->pkg->clear();
     QStringList packages = pkgsrc.packageList(cat,ui->search->text());
+
     for (int i = 0; i < packages.size(); ++i)
     {
         QString value = packages.at(i);
@@ -182,6 +181,8 @@ void MainWindow::genPkgList(QString cat)
             }
         }
     }
+    //if (!ui->packagesTab->isEnabled())
+
 }
 
 void MainWindow::on_cat_itemClicked(QListWidgetItem *item)
@@ -189,6 +190,7 @@ void MainWindow::on_cat_itemClicked(QListWidgetItem *item)
     if (!item->text().isEmpty())
     {
         ui->search->clear();
+        //ui->packagesTab->setDisabled(true);
         genPkgList(item->text());
     }
 }
@@ -207,14 +209,19 @@ ui->pkgBox->setCurrentIndex(0);
     //if (!pkgsrcPkgVersion->isOpen())
       //  pkgsrcPkgVersionExec(item->text(),item->data(5).toString());
 
+    if (ui->pushButton->isEnabled())
+    {
+        ui->pushButton->setEnabled(false);
+    }
     pkgsrc.packageNameRequest(item->text(),item->data(5).toString());
     pkgsrc.packageVersionRequest(item->text(),item->data(5).toString());
 
 
-    if (!ui->pushButton->isEnabled())
+
+    /*if (!ui->pushButton->isEnabled())
     {
         ui->pushButton->setEnabled(true);
-    }
+    }*/
 
 
 }
@@ -432,12 +439,14 @@ void MainWindow::on_search_editingFinished()
 {
     if (!ui->search->text().isEmpty())
     {
+        //ui->packagesTab->setDisabled(true);
         genPkgList("");
     }
     else
     {
         if (ui->cat->currentItem())
         {
+            //ui->packagesTab->setDisabled(true);
             genPkgList(ui->cat->currentItem()->text());
         }
     }
@@ -584,6 +593,7 @@ bool MainWindow::bootstrapCheck()
     catGen();
     pkgsrc.packagesInstalledRequest();
     pkgsrc.packagesVulnsRequest();
+    checkUpdates();
 
     return status;
 }
@@ -698,15 +708,29 @@ void MainWindow::bootstrapMakeRead(QString data)
 void MainWindow::on_queue_customContextMenuRequested()
 {
     QMenu *menu=new QMenu;
-    int row = 0;
-    row = ui->queue->topLevelItemCount();
+    int row = -1;
+    row = ui->queue->topLevelItemCount()-1;
     QTreeWidgetItem *item = ui->queue->currentItem();
-    if (row>0 && item)
+    if (row>-1 && item)
     {
         if (item->data(2,3).toInt()==1||item->data(2,3).toInt()>2) {
             QAction* delRow = new QAction("Remove from queue",this);
             connect(delRow,SIGNAL(triggered()),this,SLOT(delPackageFromQueue()));
             menu->addAction(delRow);
+        }
+        if (item->data(2,3).toInt()==1) {
+            int rowID = ui->queue->currentIndex().row();
+            if (rowID>0) {
+                QAction* rowUp = new QAction("Move up",this);
+                connect(rowUp,SIGNAL(triggered()),this,SLOT(queueRowUp()));
+                menu->addAction(rowUp);
+            }
+            if (rowID>=0&&rowID<row) {
+                QAction* rowDown = new QAction("Move down",this);
+                connect(rowDown,SIGNAL(triggered()),this,SLOT(queueRowDown()));
+                menu->addAction(rowDown);
+            }
+
         }
         /*if (item->data(2,3).toInt()==4) {
             QAction* retryRow = new QAction("Requeue",this);
@@ -1026,8 +1050,13 @@ void MainWindow::pkgsrcPkgVersionFinished(QString version)
     //QString version;
     //version = pkgsrcPkgVersion->readAll();
     //pkgsrcPkgVersion->close();
-    if (!version.isEmpty())
+    if (!version.isEmpty()) {
         ui->pkgVersion->setText(version);
+        if (!ui->pushButton->isEnabled())
+        {
+            ui->pushButton->setEnabled(true);
+        }
+    }
     else
         ui->pkgVersion->clear();
 }
@@ -1046,8 +1075,13 @@ void MainWindow::pkgsrcPkgNameFinished(QString name)
     //QString name;
     //name = pkgsrcPkgName->readAll();
     //pkgsrcPkgName->close();
-    if (!name.isEmpty())
+    if (!name.isEmpty()) {
         ui->pkgName->setText(name);
+        if (!ui->pushButton->isEnabled())
+        {
+            ui->pushButton->setEnabled(true);
+        }
+    }
     else
         ui->pkgName->clear();
 }
@@ -1172,7 +1206,7 @@ void MainWindow::delPackageLog(QString text)
 {
     QString line = text;
     ui->log->appendPlainText(line);
-    qDebug() << line;
+    //qDebug() << line;
     if (line.contains("required by other packages")||line.contains("not for deletion")) {
         ui->statusBar->showMessage(line.replace("pkg_delete:",""),10000);
     }
@@ -1197,9 +1231,69 @@ void MainWindow::pkgsrcSyncLog(QString log)
 
 void MainWindow::pkgsrcSyncDone(int status)
 {
-    qDebug()<<"foo"<<status;
+    //qDebug()<<"foo"<<status;
     if (status==0)
         ui->statusBar->showMessage("Sync complete",5000);
     else
         ui->statusBar->showMessage("Sync failed",50000);
+}
+
+void MainWindow::readMKconf()
+{
+    QFile MKconf(QDir::homePath()+"/pkg/etc/mk.conf");
+    if (MKconf.exists()) {
+        if (MKconf.open(QIODevice::ReadOnly)) {
+            QTextStream stream(&MKconf);
+            ui->mkconf->clear();
+            ui->mkconf->appendPlainText(stream.readAll());
+        }
+    }
+}
+
+void MainWindow::saveMKconf()
+{
+    QFile MKconf(QDir::homePath()+"/pkg/etc/mk.conf");
+    if (MKconf.exists()) {
+        if (MKconf.open(QIODevice::WriteOnly)) {
+            QTextStream stream(&MKconf);
+            stream << ui->mkconf->toPlainText();
+        }
+    }
+    readMKconf();
+}
+
+
+void MainWindow::on_mkconfSave_clicked()
+{
+    saveMKconf();
+}
+
+void MainWindow::on_mkconfUndo_clicked()
+{
+    readMKconf();
+}
+
+void MainWindow::queueRowDown()
+{
+    QTreeWidgetItem *item = ui->queue->currentItem();
+    int index = ui->queue->currentIndex().row();
+    if (index>-1 && item) {
+        ui->queue->takeTopLevelItem(index);
+        ui->queue->insertTopLevelItem(index+1,item);
+    }
+}
+
+void MainWindow::queueRowUp()
+{
+    QTreeWidgetItem *item = ui->queue->currentItem();
+    int index = ui->queue->currentIndex().row();
+    if (index>0 && item) {
+        ui->queue->takeTopLevelItem(index);
+        ui->queue->insertTopLevelItem(index-1,item);
+    }
+}
+
+void MainWindow::checkUpdates()
+{
+    qDebug()<< pkgsrc.packageUpdates();
 }
