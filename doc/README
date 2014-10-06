@@ -1,21 +1,40 @@
 UserPKG
-========
+=======
+![alt logo](https://raw.githubusercontent.com/dracolinux/UserPKG/master/res/hicolor/48x48/UserPKG.png)
 
 Unprivileged package manager for Linux and NetBSD.
 
-UserPKG is a convenient front-end for pkgsrc, simplifiying the installation and usage of third-party software for users.
+UserPKG is a convenient front-end for pkgsrc, simplifiying the installation and usage of third-party software. No administrator access needed.
 
 Requirements
 ============
 
-* Linux/NetBSD
+* Linux
+* NetBSD
 * Build essentials
 
 Status
 ======
 
-Early Alpha.
+Early Alpha, but usable.
 
+Roadmap/TODO
+============
+
+* Check for cvs, if not build.
+* Better feedback on pkgsrc sync
+* Switch pkgsrc branch
+* Check for updates (and list them, and offer to add to queue as update action)
+* pause/stop/restart queue (stop works)
+* better feedback on build
+* save/restore ui
+* settings (basic support added)
+* startup wizard
+* major code cleanup (v1rc2)
+* dbus client (v1+)
+* binary pkg support (v2+)
+* add action support to queue
+* add windows/mingw support (v2+)
 
 Install
 =======
@@ -25,16 +44,21 @@ Download latest release for Linux/NetBSD, or build you own.
 Build
 =====
 
+Requires Qt (4.6+) development files installed prior to building UserPKG.
+
 ```
 git submodule update -i
 cd DracoPKG/lib ; qmake CONFIG+=libpkgsrc CONFIG+=staticlib PREFIX=$(pwd)/../build  && make install
-cd ../../ ; qmake PREFIX=/usr CONFIG+=libpkgsrc && make install
+cd ../../ ; qmake CONFIG+=libpkgsrc && make
+./build/UserPKG
 ```
 
 License
 =======
 
 Copyright (c) 2014 Ole Andre Rodlie <olear@dracolinux.org>. All rights reserved.
+
+Copyright (c) 2014 FxArena DA <mail@fxarena.net>. All rights reserved.
 
 UserPKG is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License version 2.
 

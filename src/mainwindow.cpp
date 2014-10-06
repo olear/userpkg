@@ -6,6 +6,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    QTimer::singleShot(0,this,SLOT(initApp()));
+}
+
+void MainWindow::initApp()
+{
+
     ui->statusBar->addPermanentWidget(ui->progressBar);
     ui->progressBar->hide();
     //ui->pkg->setUniformItemSizes(true);
@@ -13,7 +19,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->pushButton->setEnabled(false);
     ui->queue->setHeaderHidden(false);
 
+    //ui->pkg->setViewMode(QListView::IconMode);
+
     tray = new QSystemTrayIcon(this);
+
+    timer.start(); // get a time reference
 
     connect(&pkgsrc,SIGNAL(packageOptionsResult(QStringList)),this,SLOT(packageOptions(QStringList)));
     connect(&pkgsrc,SIGNAL(downloadFinished(int)),this,SLOT(pkgsrcDownloadFinished(int)));
@@ -56,19 +66,21 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         tray->show();
     }
+    if (tray->isVisible()) {
+        for (int i = 0; i < QApplication::arguments().size(); ++i) {
+            if (QApplication::arguments().at(i).contains("--tray"))
+                this->hide();
+        }
+    }
+    readMKconf();
 }
 
 void MainWindow::trayActivated()
 {
         if(this->isHidden())
-        {
             this->show();
-        }
         else
-        {
             this->hide();
-
-        }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -117,11 +129,13 @@ void MainWindow::genPkgList(QString cat)
 {
     ui->pkg->clear();
     QStringList packages = pkgsrc.packageList(cat,ui->search->text());
+
     for (int i = 0; i < packages.size(); ++i)
     {
         QString value = packages.at(i);
         QString package;
         QString category;
+        QString desc;
         if (value.contains("|"))
         {
             QStringList values = value.split("|",QString::SkipEmptyParts);
@@ -131,6 +145,9 @@ void MainWindow::genPkgList(QString cat)
                 if (!values.isEmpty())
                 {
                     package = values.takeFirst();
+                }
+                if (!values.isEmpty()) {
+                    desc = values.takeFirst();
                 }
             }
         }
@@ -157,15 +174,15 @@ void MainWindow::genPkgList(QString cat)
                     }
                 }
 
-            /*if (!category.isEmpty())
-            { // old lost feature from pre1, add description
-                newItem->setData(3,category);
-            }*/
+            if (!desc.isEmpty())
+                newItem->setData(3,desc);
 
                 ui->pkg->addItem(newItem);
             }
         }
     }
+    //if (!ui->packagesTab->isEnabled())
+
 }
 
 void MainWindow::on_cat_itemClicked(QListWidgetItem *item)
@@ -173,6 +190,7 @@ void MainWindow::on_cat_itemClicked(QListWidgetItem *item)
     if (!item->text().isEmpty())
     {
         ui->search->clear();
+        //ui->packagesTab->setDisabled(true);
         genPkgList(item->text());
     }
 }
@@ -191,14 +209,19 @@ ui->pkgBox->setCurrentIndex(0);
     //if (!pkgsrcPkgVersion->isOpen())
       //  pkgsrcPkgVersionExec(item->text(),item->data(5).toString());
 
+    if (ui->pushButton->isEnabled())
+    {
+        ui->pushButton->setEnabled(false);
+    }
     pkgsrc.packageNameRequest(item->text(),item->data(5).toString());
     pkgsrc.packageVersionRequest(item->text(),item->data(5).toString());
 
 
-    if (!ui->pushButton->isEnabled())
+
+    /*if (!ui->pushButton->isEnabled())
     {
         ui->pushButton->setEnabled(true);
-    }
+    }*/
 
 
 }
@@ -246,6 +269,7 @@ void MainWindow::on_options_itemActivated(QTreeWidgetItem *item)
     }
 }
 
+/*
 void MainWindow::installedPackagesGenTree()
 {
     ui->installedPackagesTree->clear();
@@ -267,6 +291,7 @@ void MainWindow::installedPackagesGenTree()
         }
     }
 }
+*/
 
 void MainWindow::pkgsrcInstalledFinished(QStringList packages)
 {
@@ -327,7 +352,7 @@ void MainWindow::on_actionQuit_triggered()
 
 void MainWindow::on_actionAbout_triggered()
 {
-    QMessageBox::about(this,"About UserPKG "+QApplication::applicationVersion(),"<h3>UserPKG "+QApplication::applicationVersion()+"</h3>Unprivileged package manager.<br><br>UserPKG Copyright &copy; 2014 Ole Andre Rodlie. All rights reserved.<br><br>UserPKG is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License version 2.<br><br>UserPKG is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.<br><br>You should have received a copy of the GNU General Public License version 2 along with UserPKG.  If not, see http://www.gnu.org/licenses/.<br><br>Visit <a href='http://dracolinux.org'>DracoLinux.org</a> for more information. Comments, bugs etc goes to <a href='mailto:olear@dracolinux.org'>olear@dracolinux.org</a>.");
+    QMessageBox::about(this,"About UserPKG "+QApplication::applicationVersion(),"<h3>UserPKG "+QApplication::applicationVersion()+"</h3>Unprivileged package manager.<br><br>UserPKG Copyright &copy; 2014 Ole Andre Rodlie. All rights reserved.<br>UserPKG Copyright &copy; 2014 FxArena DA. All rights reserved.<br><br>UserPKG is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License version 2.<br><br>UserPKG is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.<br><br>You should have received a copy of the GNU General Public License version 2 along with UserPKG.  If not, see http://www.gnu.org/licenses/.<br><br>Visit <a href='http://dracolinux.org'>DracoLinux.org</a> for more information. Comments, bugs etc goes to <a href='mailto:olear@dracolinux.org'>olear@dracolinux.org</a>.<br><br>Uptime: "+QString::number(timer.elapsed()));
 }
 
 void MainWindow::on_actionAbout_pkgsrc_triggered()
@@ -414,12 +439,14 @@ void MainWindow::on_search_editingFinished()
 {
     if (!ui->search->text().isEmpty())
     {
+        //ui->packagesTab->setDisabled(true);
         genPkgList("");
     }
     else
     {
         if (ui->cat->currentItem())
         {
+            //ui->packagesTab->setDisabled(true);
             genPkgList(ui->cat->currentItem()->text());
         }
     }
@@ -492,7 +519,7 @@ bool MainWindow::bootstrapCheck()
             userBashProfile.close();
             if (tray->isVisible())
             {
-                tray->showMessage("Profile modified","Modified your bash_profile, you must logout to apply modifications later");
+                tray->showMessage("Profile modified","Modified your bash profile, you shoild logout to apply modifications");
             }
         }
     }
@@ -505,7 +532,7 @@ bool MainWindow::bootstrapCheck()
         }
         if (tray->isVisible())
         {
-            tray->showMessage("Profile modified","Modified your bash_profile, you must logout to apply modifications later");
+            tray->showMessage("Profile modified","Modified your bash profile, you should logout to apply modifications");
         }
     }
     userBashProfile.close();
@@ -566,6 +593,7 @@ bool MainWindow::bootstrapCheck()
     catGen();
     pkgsrc.packagesInstalledRequest();
     pkgsrc.packagesVulnsRequest();
+    checkUpdates();
 
     return status;
 }
@@ -651,7 +679,8 @@ void MainWindow::bootstrapMakeFinished(int status)
         ui->statusBar->showMessage("Bootstrapping done, you should now logout to apply desktop integration");
         pkgsrc.packageCleanRequest();
         catGen();
-        installedPackagesGenTree();
+        //installedPackagesGenTree();
+        pkgsrc.packagesInstalledRequest();
     }
     else
     {
@@ -679,15 +708,29 @@ void MainWindow::bootstrapMakeRead(QString data)
 void MainWindow::on_queue_customContextMenuRequested()
 {
     QMenu *menu=new QMenu;
-    int row = 0;
-    row = ui->queue->topLevelItemCount();
+    int row = -1;
+    row = ui->queue->topLevelItemCount()-1;
     QTreeWidgetItem *item = ui->queue->currentItem();
-    if (row>0 && item)
+    if (row>-1 && item)
     {
         if (item->data(2,3).toInt()==1||item->data(2,3).toInt()>2) {
             QAction* delRow = new QAction("Remove from queue",this);
             connect(delRow,SIGNAL(triggered()),this,SLOT(delPackageFromQueue()));
             menu->addAction(delRow);
+        }
+        if (item->data(2,3).toInt()==1) {
+            int rowID = ui->queue->currentIndex().row();
+            if (rowID>0) {
+                QAction* rowUp = new QAction("Move up",this);
+                connect(rowUp,SIGNAL(triggered()),this,SLOT(queueRowUp()));
+                menu->addAction(rowUp);
+            }
+            if (rowID>=0&&rowID<row) {
+                QAction* rowDown = new QAction("Move down",this);
+                connect(rowDown,SIGNAL(triggered()),this,SLOT(queueRowDown()));
+                menu->addAction(rowDown);
+            }
+
         }
         /*if (item->data(2,3).toInt()==4) {
             QAction* retryRow = new QAction("Requeue",this);
@@ -771,7 +814,7 @@ void MainWindow::queueStart()
 void MainWindow::queueStop()
 {
     if (pkgsrc.bmakeStop())
-        ui->queue->clear();
+        ui->queue->clear(); // not a good solution, mark as new or error on stop
     //queue->close();
     /*ui->progressBar->setMaximum(100);
     ui->progressBar->setValue(0);
@@ -833,8 +876,9 @@ void MainWindow::queueFinished(int status)
         ui->progressBar->setValue(0);
         if (!ui->progressBar->isHidden())
             ui->progressBar->hide();
-        installedPackagesGenTree();
+        //installedPackagesGenTree();
         //pkgsrcPkgVulnCheckExec();
+        pkgsrc.packagesInstalledRequest();
         pkgsrc.packagesVulnsRequest();
 
         // Make pretty log for debugging
@@ -1006,8 +1050,13 @@ void MainWindow::pkgsrcPkgVersionFinished(QString version)
     //QString version;
     //version = pkgsrcPkgVersion->readAll();
     //pkgsrcPkgVersion->close();
-    if (!version.isEmpty())
+    if (!version.isEmpty()) {
         ui->pkgVersion->setText(version);
+        if (!ui->pushButton->isEnabled())
+        {
+            ui->pushButton->setEnabled(true);
+        }
+    }
     else
         ui->pkgVersion->clear();
 }
@@ -1026,8 +1075,13 @@ void MainWindow::pkgsrcPkgNameFinished(QString name)
     //QString name;
     //name = pkgsrcPkgName->readAll();
     //pkgsrcPkgName->close();
-    if (!name.isEmpty())
+    if (!name.isEmpty()) {
         ui->pkgName->setText(name);
+        if (!ui->pushButton->isEnabled())
+        {
+            ui->pushButton->setEnabled(true);
+        }
+    }
     else
         ui->pkgName->clear();
 }
@@ -1069,6 +1123,7 @@ void MainWindow::pkgsrcPkgVulnCheckFinished(QStringList result)
 {
     if (!result.isEmpty())
     {
+        int oldVulns = ui->pkgVuln->topLevelItemCount();
         ui->pkgVuln->clear();
         for (int i = 0; i < result.size(); ++i)
         {
@@ -1091,6 +1146,12 @@ void MainWindow::pkgsrcPkgVulnCheckFinished(QStringList result)
                 item->setIcon(0,QIcon(":/files/queue-package.png"));
                 ui->pkgVuln->addTopLevelItem(item);
             }
+        }
+        int newVulns = ui->pkgVuln->topLevelItemCount();
+        if (newVulns>oldVulns) {
+            if(tray->isVisible())
+                tray->showMessage("Security Alert","Vulnerabilites found!");
+            ui->statusBar->showMessage("Vulnerabilites found!");
         }
     }
 }
@@ -1145,7 +1206,7 @@ void MainWindow::delPackageLog(QString text)
 {
     QString line = text;
     ui->log->appendPlainText(line);
-    qDebug() << line;
+    //qDebug() << line;
     if (line.contains("required by other packages")||line.contains("not for deletion")) {
         ui->statusBar->showMessage(line.replace("pkg_delete:",""),10000);
     }
@@ -1170,9 +1231,69 @@ void MainWindow::pkgsrcSyncLog(QString log)
 
 void MainWindow::pkgsrcSyncDone(int status)
 {
-    qDebug()<<"foo"<<status;
+    //qDebug()<<"foo"<<status;
     if (status==0)
         ui->statusBar->showMessage("Sync complete",5000);
     else
         ui->statusBar->showMessage("Sync failed",50000);
+}
+
+void MainWindow::readMKconf()
+{
+    QFile MKconf(QDir::homePath()+"/pkg/etc/mk.conf");
+    if (MKconf.exists()) {
+        if (MKconf.open(QIODevice::ReadOnly)) {
+            QTextStream stream(&MKconf);
+            ui->mkconf->clear();
+            ui->mkconf->appendPlainText(stream.readAll());
+        }
+    }
+}
+
+void MainWindow::saveMKconf()
+{
+    QFile MKconf(QDir::homePath()+"/pkg/etc/mk.conf");
+    if (MKconf.exists()) {
+        if (MKconf.open(QIODevice::WriteOnly)) {
+            QTextStream stream(&MKconf);
+            stream << ui->mkconf->toPlainText();
+        }
+    }
+    readMKconf();
+}
+
+
+void MainWindow::on_mkconfSave_clicked()
+{
+    saveMKconf();
+}
+
+void MainWindow::on_mkconfUndo_clicked()
+{
+    readMKconf();
+}
+
+void MainWindow::queueRowDown()
+{
+    QTreeWidgetItem *item = ui->queue->currentItem();
+    int index = ui->queue->currentIndex().row();
+    if (index>-1 && item) {
+        ui->queue->takeTopLevelItem(index);
+        ui->queue->insertTopLevelItem(index+1,item);
+    }
+}
+
+void MainWindow::queueRowUp()
+{
+    QTreeWidgetItem *item = ui->queue->currentItem();
+    int index = ui->queue->currentIndex().row();
+    if (index>0 && item) {
+        ui->queue->takeTopLevelItem(index);
+        ui->queue->insertTopLevelItem(index-1,item);
+    }
+}
+
+void MainWindow::checkUpdates()
+{
+    qDebug()<< pkgsrc.packageUpdates();
 }

@@ -15,6 +15,8 @@
 #include <QMessageBox>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QTime>
+#include <QTimer>
 
 #ifdef LIBPKGSRC
 #include <PkgSrc/pkgsrc.h>
@@ -42,9 +44,10 @@ protected:
     void closeEvent(QCloseEvent *event);
 
 private slots:
+    void initApp();
     void trayActivated();
     void catGen();
-    void installedPackagesGenTree();
+    //void installedPackagesGenTree();
     void addPackageToQueue(QString package, QString category, QString options);
     void delPackageFromQueue();
     void queueStart();
@@ -90,10 +93,22 @@ private slots:
     void pkgsrcSyncLog(QString log);
     void pkgsrcSyncDone(int status);
 
+    void readMKconf();
+    void saveMKconf();
+
+    void on_mkconfSave_clicked();
+
+    void on_mkconfUndo_clicked();
+    void queueRowUp();
+    void queueRowDown();
+
+    void checkUpdates();
 private:
     Ui::MainWindow *ui;
     PkgSrc pkgsrc;
     QSystemTrayIcon *tray;
+    QTime timer;
+    int time_snapshot;
 };
 
 #endif // MAINWINDOW_H
