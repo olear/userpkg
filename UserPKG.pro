@@ -1,7 +1,7 @@
 QT                                  += core gui network
 TARGET                               = UserPKG
 TEMPLATE                             = app
-VERSION                              = 20141005
+VERSION                              = 20141007
 SOURCES                             += src/main.cpp src/mainwindow.cpp \
     src/backend.cpp
 HEADERS                             += src/mainwindow.h \
