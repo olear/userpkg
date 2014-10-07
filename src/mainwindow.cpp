@@ -11,7 +11,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::initApp()
 {
-
     ui->statusBar->addPermanentWidget(ui->progressBar);
     ui->progressBar->hide();
     //ui->pkg->setUniformItemSizes(true);
@@ -48,6 +47,8 @@ void MainWindow::initApp()
 
     connect(&pkgsrc,SIGNAL(pkgsrcReady()),this,SLOT(bootstrapCheck()));
 
+    connect(&work,SIGNAL(updateListResult(QStringList)),this,SLOT(catchUpdates(QStringList)));
+
     pkgsrc.initPkgsrc();
 
     /*if (bootstrapCheck())
@@ -73,6 +74,7 @@ void MainWindow::initApp()
         }
     }
     readMKconf();
+
 }
 
 void MainWindow::trayActivated()
@@ -250,7 +252,7 @@ void MainWindow::on_pushButton_clicked()
         ui->pkgName->clear();
         ui->pkgDepends->clear();
         ui->pushButton->setDisabled(true);
-        addPackageToQueue(ui->pkg->currentItem()->text(),ui->pkg->currentItem()->data(5).toString(),options);
+        addPackageToQueue(ui->pkg->currentItem()->text(),ui->pkg->currentItem()->data(5).toString(),options, 1);
         delete ui->pkg->currentItem();
     }
 }
@@ -595,6 +597,16 @@ bool MainWindow::bootstrapCheck()
     pkgsrc.packagesVulnsRequest();
     checkUpdates();
 
+    // pkg_tarup is needed for make replace
+    QFile pkg_tarup(QDir::homePath()+"/pkg/bin/pkg_tarup");
+    if (!pkg_tarup.exists())
+        addPackageToQueue("pkg_tarup","pkgtools","",1);
+
+    // cvs is needed to sync
+    QFile pkg_cvs(QDir::homePath()+"/pkg/bin/cvs");
+    if (!pkg_cvs.exists())
+        addPackageToQueue("scmcvs","devel","",1);
+
     return status;
 }
 
@@ -758,12 +770,13 @@ void MainWindow::queueRetry()
         item->setData(2,3,1);
 }
 
-void MainWindow::addPackageToQueue(QString package, QString category, QString options)
+void MainWindow::addPackageToQueue(QString package, QString category, QString options, int action)
 {
     QTreeWidgetItem *item = new QTreeWidgetItem;
     item->setText(0,package);
     item->setData(0,3,category);
     item->setText(1,options);
+    item->setData(1,3,action);
     item->setText(2,"Pending");
     item->setData(2,3,1);
     item->setIcon(0,QIcon(":/files/queue-package.png"));
@@ -800,7 +813,16 @@ void MainWindow::queueStart()
             }
             if (queueItem>-1)
             {
-                if (pkgsrc.bmakeStart(ui->queue->topLevelItem(queueItem)->text(0),ui->queue->topLevelItem(queueItem)->data(0,3).toString(),ui->queue->topLevelItem(queueItem)->text(1),"install"))
+                int action = ui->queue->topLevelItem(queueItem)->data(1,3).toInt();
+                QString cmd;
+                if (action == 1)
+                    cmd = "install";
+                if (action == 2)
+                    cmd = "update";
+                if (action == 3)
+                    cmd = "replace";
+
+                if (pkgsrc.bmakeStart(ui->queue->topLevelItem(queueItem)->text(0),ui->queue->topLevelItem(queueItem)->data(0,3).toString(),ui->queue->topLevelItem(queueItem)->text(1),cmd))
                 {
                     ui->queue->topLevelItem(queueItem)->setData(2,3,2);
                     ui->queue->topLevelItem(queueItem)->setText(2,"Working ...");
@@ -1169,7 +1191,6 @@ void MainWindow::on_installedPackagesTree_customContextMenuRequested()
             menu->addAction(delPkg);
             menu->exec(QCursor::pos());
     }
-
 }
 
 void MainWindow::delPackage()
@@ -1231,9 +1252,10 @@ void MainWindow::pkgsrcSyncLog(QString log)
 
 void MainWindow::pkgsrcSyncDone(int status)
 {
-    //qDebug()<<"foo"<<status;
-    if (status==0)
+    if (status==0) {
         ui->statusBar->showMessage("Sync complete",5000);
+        work.requestUpdateList();
+    }
     else
         ui->statusBar->showMessage("Sync failed",50000);
 }
@@ -1295,5 +1317,103 @@ void MainWindow::queueRowUp()
 
 void MainWindow::checkUpdates()
 {
-    qDebug()<< pkgsrc.packageUpdates();
+    work.requestUpdateList();
+}
+
+void MainWindow::catchUpdates(QStringList result)
+{
+    if (!result.isEmpty()) {
+        ui->packageUpdates->clear();
+        for (int i = 0; i < result.size(); ++i) {
+            QStringList pkgInfo = result.at(i).split("|",QString::SkipEmptyParts);
+            QString pkgPath;
+            QString pkgName;
+            QString pkgVersion;
+            QString pkgNewVersion;
+            if (!pkgInfo.isEmpty())
+            {
+                if (!pkgInfo.isEmpty()) {
+                    pkgPath = pkgInfo.takeFirst();
+                    if (!pkgInfo.isEmpty())
+                    {
+                        pkgName = pkgInfo.takeFirst();
+                        if (!pkgInfo.isEmpty())
+                        {
+                            pkgVersion = pkgInfo.takeFirst();
+                            if (!pkgInfo.isEmpty())
+                                pkgNewVersion = pkgInfo.takeFirst();
+                        }
+                    }
+                }
+                if (!pkgPath.isEmpty()&&!pkgName.isEmpty()&&!pkgVersion.isEmpty()&&!pkgNewVersion.isEmpty()) {
+                    QTreeWidgetItem *newItem = new QTreeWidgetItem;
+                    newItem->setText(0,pkgName);
+                    newItem->setData(0,3,pkgPath);
+                    newItem->setText(1,pkgVersion);
+                    newItem->setText(2,pkgNewVersion);
+                    newItem->setIcon(0,QIcon(":/files/queue-package.png"));
+                    ui->packageUpdates->addTopLevelItem(newItem);
+                }
+            }
+        }
+    }
+    if (tray->isVisible())
+        tray->showMessage("Security","Updates available");
+    ui->statusBar->showMessage("Package updates available");
+}
+
+void MainWindow::on_packageUpdates_customContextMenuRequested()
+{
+    int row = -1;
+    row = ui->packageUpdates->topLevelItemCount();
+    QTreeWidgetItem *item = ui->packageUpdates->currentItem();
+    if (row>-1 && item)
+    {
+            QMenu *menu=new QMenu;
+            QAction* updatepkg = new QAction("Update package",this);
+            QAction* replacepkg = new QAction("Replace package",this);
+            connect(updatepkg,SIGNAL(triggered()),this,SLOT(addPkgUpdateToQueue()));
+            connect(replacepkg,SIGNAL(triggered()),this,SLOT(addPkgReplaceToQueue()));
+            menu->addAction(updatepkg);
+            menu->addAction(replacepkg);
+            menu->exec(QCursor::pos());
+    }
+}
+
+void MainWindow::addPkgUpdateToQueue()
+{
+    QTreeWidgetItem *item = ui->packageUpdates->currentItem();
+    if (item) {
+        QStringList pkgpath = item->data(0,3).toString().split("/");
+        QString pkgcat;
+        QString pkgname;
+        if (!pkgpath.isEmpty()) {
+            pkgcat = pkgpath.takeFirst();
+            if (!pkgpath.isEmpty())
+                pkgname = pkgpath.takeFirst();
+        }
+        if (!pkgcat.isEmpty()&&!pkgname.isEmpty()) {
+            addPackageToQueue(pkgname,pkgcat,"",2);
+            delete item;
+        }
+    }
+}
+
+void MainWindow::addPkgReplaceToQueue()
+{
+    QTreeWidgetItem *item = ui->packageUpdates->currentItem();
+    if (item) {
+        QStringList pkgpath = item->data(0,3).toString().split("/");
+        QString pkgcat;
+        QString pkgname;
+        if (!pkgpath.isEmpty()) {
+            pkgcat = pkgpath.takeFirst();
+            if (!pkgpath.isEmpty())
+                pkgname = pkgpath.takeFirst();
+        }
+        if (!pkgcat.isEmpty()&&!pkgname.isEmpty()) {
+            addPackageToQueue(pkgname,pkgcat,"",3);
+            delete item;
+        }
+    }
 }

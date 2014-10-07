@@ -17,6 +17,7 @@
 #include <QUrl>
 #include <QTime>
 #include <QTimer>
+#include "backend.h"
 
 #ifdef LIBPKGSRC
 #include <PkgSrc/pkgsrc.h>
@@ -48,7 +49,7 @@ private slots:
     void trayActivated();
     void catGen();
     //void installedPackagesGenTree();
-    void addPackageToQueue(QString package, QString category, QString options);
+    void addPackageToQueue(QString package, QString category, QString options, int action);
     void delPackageFromQueue();
     void queueStart();
     void queueFinished(int status);
@@ -103,12 +104,18 @@ private slots:
     void queueRowDown();
 
     void checkUpdates();
+    void catchUpdates(QStringList result);
+    void on_packageUpdates_customContextMenuRequested();
+    void addPkgUpdateToQueue();
+    void addPkgReplaceToQueue();
+
 private:
     Ui::MainWindow *ui;
     PkgSrc pkgsrc;
     QSystemTrayIcon *tray;
     QTime timer;
     int time_snapshot;
+    Backend work;
 };
 
 #endif // MAINWINDOW_H
