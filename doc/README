@@ -2,15 +2,14 @@ UserPKG
 =======
 ![alt logo](https://raw.githubusercontent.com/dracolinux/UserPKG/master/res/hicolor/48x48/UserPKG.png)
 
-Unprivileged package manager for Linux and NetBSD.
+Unprivileged package manager for Linux/BSD.
 
 UserPKG is a convenient front-end for pkgsrc, simplifiying the installation and usage of third-party software. No administrator access needed.
 
 Requirements
 ============
 
-* Linux
-* NetBSD
+* Linux/BSD
 * Build essentials
 
 Status
@@ -21,25 +20,33 @@ Early Alpha, but usable.
 Roadmap/TODO
 ============
 
-* Check for cvs, if not build.
-* Better feedback on pkgsrc sync
-* Switch pkgsrc branch
-* Check for updates (and list them, and offer to add to queue as update action)
-* pause/stop/restart queue (stop works)
-* better feedback on build
-* save/restore ui
-* settings (basic support added)
-* startup wizard
-* major code cleanup (v1rc2)
-* dbus client (v1+)
-* binary pkg support (v2+)
-* add action support to queue
-* add windows/mingw support (v2+)
+* Version 1.0
+ * Better feedback on sync
+ * Switch pkgsrc branch
+ * pause/stop/restart queue (stop works)
+ * better feedback on build
+ * save/restore ui
+ * settings (basic support added)
+ * startup wizard
+ * move slow functions (search,list pkgs) to backend thread (added backend)
+ * major code cleanup
+* Version 1.0.x
+ * Bug fixes
+* Version 1.1
+ * dbus client (system/global support)
+* Version 1.1.x
+ * Bug fixes
+* Version 2.0
+ * binary pkg support
+ * add windows/mingw support
+ * add macos support
+* Version 2.0.x
+ * Bug fixes
 
 Install
 =======
 
-Download latest release for Linux/NetBSD, or build you own.
+Download latest release, or build you own.
 
 Build
 =====

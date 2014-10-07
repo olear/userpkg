@@ -25,7 +25,7 @@
        <enum>QTabWidget::South</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="packagesTab">
        <attribute name="title">
@@ -135,9 +135,9 @@
                <property name="geometry">
                 <rect>
                  <x>0</x>
-                 <y>-15</y>
+                 <y>0</y>
                  <width>215</width>
-                 <height>95</height>
+                 <height>94</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -388,6 +388,9 @@
        <layout class="QVBoxLayout" name="verticalLayout_12">
         <item>
          <widget class="QTreeWidget" name="packageUpdates">
+          <property name="contextMenuPolicy">
+           <enum>Qt::CustomContextMenu</enum>
+          </property>
           <column>
            <property name="text">
             <string>Package</string>
@@ -699,8 +702,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>605</width>
-             <height>155</height>
+             <width>98</width>
+             <height>28</height>
             </rect>
            </property>
            <attribute name="label">
