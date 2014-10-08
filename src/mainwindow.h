@@ -17,7 +17,10 @@
 #include <QUrl>
 #include <QTime>
 #include <QTimer>
+#include <QSettings>
 #include "backend.h"
+#include "wizard.h"
+#include "preferences.h"
 
 #ifdef LIBPKGSRC
 #include <PkgSrc/pkgsrc.h>
@@ -94,12 +97,12 @@ private slots:
     void pkgsrcSyncLog(QString log);
     void pkgsrcSyncDone(int status);
 
-    void readMKconf();
-    void saveMKconf();
+//    void readMKconf();
+  //  void saveMKconf();
 
-    void on_mkconfSave_clicked();
+//    void on_mkconfSave_clicked();
 
-    void on_mkconfUndo_clicked();
+  //  void on_mkconfUndo_clicked();
     void queueRowUp();
     void queueRowDown();
 
@@ -109,6 +112,12 @@ private slots:
     void addPkgUpdateToQueue();
     void addPkgReplaceToQueue();
 
+    void on_actionPreferences_triggered();
+
+
+
+    void startWiz();
+
 private:
     Ui::MainWindow *ui;
     PkgSrc pkgsrc;
@@ -116,6 +125,9 @@ private:
     QTime timer;
     int time_snapshot;
     Backend work;
+    Wizard wiz;
+    Preferences prefs;
+    int x11;
 };
 
 #endif // MAINWINDOW_H

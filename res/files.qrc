@@ -12,5 +12,8 @@
         <file>queue-pending.png</file>
         <file>queue-start.png</file>
         <file>tray.png</file>
+        <file>draco.png</file>
+        <file>hicolor/128x128/UserPKG.png</file>
+        <file>hicolor/48x48/UserPKG.png</file>
     </qresource>
 </RCC>

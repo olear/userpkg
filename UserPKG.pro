@@ -1,12 +1,18 @@
 QT                                  += core gui network
 TARGET                               = UserPKG
 TEMPLATE                             = app
-VERSION                              = 20141007
+VERSION                              = 20141008
 SOURCES                             += src/main.cpp src/mainwindow.cpp \
-    src/backend.cpp
+    src/backend.cpp \
+    src/wizard.cpp \
+    src/preferences.cpp
 HEADERS                             += src/mainwindow.h \
-    src/backend.h
-FORMS                               += src/mainwindow.ui
+    src/backend.h \
+    src/wizard.h \
+    src/preferences.h
+FORMS                               += src/mainwindow.ui \
+    src/wizard.ui \
+    src/preferences.ui
 RESOURCES                           += res/files.qrc
 
 DESTDIR = build
@@ -40,13 +46,15 @@ target_desktop.files			= res/$${TARGET}.desktop
 
 target_icon_32.path			= $${PREFIX}/share/icons/hicolor/32x32/apps
 target_icon_48.path			= $${PREFIX}/share/icons/hicolor/48x48/apps
+target_icon_128.path			= $${PREFIX}/share/icons/hicolor/128x128/apps
 target_icon_svg.path			= $${PREFIX}/share/icons/hicolor/scalable/apps
 
 target_icon_32.files			= res/hicolor/32x32/$${TARGET}.png
 target_icon_48.files			= res/hicolor/48x48/$${TARGET}.png
+target_icon_128.files			= res/hicolor/128x128/$${TARGET}.png
 target_icon_svg.files			= res/hicolor/scalable/$${TARGET}.svg
 
-INSTALLS                            += target target_docs target_desktop target_icon_32 target_icon_48 target_icon_svg
+INSTALLS                            += target target_docs target_desktop target_icon_32 target_icon_48 target_icon_128 target_icon_svg
 QMAKE_CLEAN                         += -r $${DESTDIR} Makefile
 
 INCLUDEPATH                         += "$${INCLUDEDIR}"
