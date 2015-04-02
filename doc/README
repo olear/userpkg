@@ -55,6 +55,7 @@ Roadmap
  * major code cleanup (code has just been added during the alpha run, do a review)
 * Version 1.5
  * dbus frontend (aka SysPKG)
+  * At this point UserPKG will probably be merged back into DracoPKG, as syspkg and userpkg.
  * NetBSD/FreeBSD support
  * use pkgsrc from github instead of cvs.netbsd.org (?)
 * Version 2.0
