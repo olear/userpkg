@@ -569,11 +569,11 @@ void MainWindow::on_queue_customContextMenuRequested()
             }
 
         }
-        /*if (item->data(2,3).toInt()==4) {
+        if (item->data(2,3).toInt()==4) {
             QAction* retryRow = new QAction("Requeue",this);
             connect(retryRow,SIGNAL(triggered()),this,SLOT(queueRetry()));
             menu->addAction(retryRow);
-        }*/
+        }
         if (pkgsrc.bmakeActive()) {
             QAction* cancelBuild = new QAction("Cancel Build",this);
             connect(cancelBuild,SIGNAL(triggered()),this,SLOT(queueStop()));
@@ -589,10 +589,13 @@ void MainWindow::on_queue_customContextMenuRequested()
 }
 
 void MainWindow::queueRetry()
-{ // Broken
+{
     QTreeWidgetItem *item = ui->queue->currentItem();
-    if (item)
+    if (item) {
         item->setData(2,3,1);
+        if (!pkgsrc.bmakeActive())
+            queueStart();
+    }
 }
 
 void MainWindow::addPackageToQueue(QString package, QString category, QString options, int action)
@@ -658,9 +661,8 @@ void MainWindow::queueStart()
 
 void MainWindow::queueStop()
 {
-    qDebug() << "Stopping queue ...";
-    if (pkgsrc.bmakeStop())
-        ui->queue->clear(); // not a good solution, mark as new or error on stop
+    pkgsrc.bmakeStop();
+    queueFinished(1);
 }
 
 void MainWindow::queueFinished(int status)
