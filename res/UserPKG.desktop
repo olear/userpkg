@@ -1,8 +1,8 @@
 [Desktop Entry]
 Encoding=UTF-8
-Name=Unprivileged package manager
-Comment=Install package from source in your home folder
-GenericName=Package manager
+Name=Unprivileged Package Manager
+Comment=Maintain and install packages (from source) in your home folder
+GenericName=Source Package manager
 Exec=UserPKG
 Icon=UserPKG
 Terminal=false
