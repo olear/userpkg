@@ -2,95 +2,70 @@ UserPKG
 =======
 ![alt logo](https://raw.githubusercontent.com/dracolinux/UserPKG/master/res/hicolor/128x128/UserPKG.png)
 
-Unprivileged package manager for Linux.
-
 UserPKG is a convenient front-end for pkgsrc, simplifiying the installation and usage of third-party software. No administrator access needed.
 
 Requirements
 ============
 
-* Linux (primary testing happens on CentOS/RHEL 6)
- * Bash
+* Linux (primary testing happens on CentOS6 at the moment, but should work on Slackware and Debian based distros)
+ * Qt (only tested on v4.6+)
+ * Bash (or proper sh, not dash etc)
  * GNU tar required (during first-run)
  * XZ required (during first-run)
  * NCurses libraries/headers required (yum install ncurses-devel)
-* Build essentials
-
-Status
-======
-
-Early beta, but usable. Most basic functions for v1 has been added, but may not have been tested over time, some functions may also not work as expected yet.
-
-Roadmap/TODO
-============
-
-* Version 1.0.0
- * add cron job (check state, sync pkgsrc, check for updates, notify)
- * fix progressbar feedback
- * add pkgsrc sync blocker, also not run if bmake runs
- * Switch pkgsrc branch, simple conf settings
- * pause/stop/restart queue (stop works)
- * save/restore ui
- * move slow functions (search,list pkgs) to backend thread (added backend)
- * major code cleanup (code has just been added during the alpha run, do a review)
-* Version 1.0.x
- * Bug fixes
-* Version 1.1.0
- * dbus client (system/global support)
- * NetBSD/FreeBSD support
-* Version 1.1.x
- * Bug fixes
-* Version 2.0.0
- * move to libarchive (remove depend on tar+xz)
- * add windows/mingw support
- * add macos support
-* Version 2.0.x
- * Bug fixes
-* Version 3.0.0
- * binary pkg support (depends on SysPKG(on ice))
+* Build essentials (gcc-g++, glibc-devel etc)
 
 Install
 =======
 
-Download latest release or build your own. 1.0.0-beta1+ breaks with earlier alpha versions, please remove existing pkgsrc installation before running UserPKG.
-
 ```
-rm -rf ~/.pkgdb* ~/pkg ~/pkgsrc ~/tmp/pkgsrc.tar.xz*
-```
-
-Build
-=====
-
-Requires Qt (4.6+) development files installed prior to build.
-
-```
+git clone https://github.com/dracolinux/UserPKG.git
+cd UserPKG
 git submodule update -i
 cd DracoPKG/lib ; qmake CONFIG+=libpkgsrc CONFIG+=staticlib PREFIX=$(pwd)/../build  && make install
 cd ../../ ; qmake CONFIG+=libpkgsrc && make
 ```
 
 ```
-./build/UserPKG
-```
-
-or
-
-```
 make install
 ```
 
-or
+```
+make INSTALL_ROOT=/my/custom/location install
+```
+
+or just run from folder:
 
 ```
-make INSTALL_ROOT=$MYPKG install
+./build/UserPKG
 ```
+
+SlackBuild and spec(RPM) are also available.
+
+Roadmap
+=======
+
+* Version 1.0
+ * add cron job (check state, sync pkgsrc, check for updates, notify)
+ * fix progressbar feedback
+ * add pkgsrc sync/update blocker, also not run if bmake runs
+ * Switch pkgsrc branch
+ * save/restore ui
+ * move slow functions (search,list pkgs) to backend thread (added backend)
+ * major code cleanup (code has just been added during the alpha run, do a review)
+* Version 1.5
+ * dbus frontend (aka SysPKG)
+  * At this point UserPKG will probably be merged back into DracoPKG, as syspkg and userpkg.
+ * NetBSD/FreeBSD support
+ * use pkgsrc from github instead of cvs.netbsd.org (?)
+* Version 2.0
+ * move to libarchive (remove depend on tar+xz)
+ * binary package support
 
 License
 =======
 
-Copyright (c) 2014 Ole Andre Rodlie <olear@dracolinux.org>. All rights reserved.
-
-Copyright (c) 2014 FxArena DA <mail@fxarena.net>. All rights reserved.
+Copyright (c) 2014-2015 Ole-André Rodlie <olear@dracolinux.org>. All rights reserved.
 
 UserPKG is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License version 2.
 
