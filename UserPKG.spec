@@ -1,21 +1,21 @@
 Summary: Unprivileged Package Manager
 Name: UserPKG
 
-Version: 20140525
-Release: 2%{dist}
+Version: 1.0alpha14
+Release: 1%{dist}
 License: GPLv2
 
 Group: System Environment/Base
-URL: http://www.dracolinux.org
+URL: http://userpkg.dracolinux.org
 
-Packager: Ole Andre Rodlie, <olear@dracolinux.org>
+Packager: Ole-André Rodlie, <olear@dracolinux.org>
 Vendor: DracoLinux, http://dracolinux.org
 
 Source: %{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
 
 BuildRequires: qt-devel
-Requires: qt DracoPKG
+Requires: qt gcc-c++ make glibc-devel ncurses-devel
 
 %description
 Unprivileged Package Manager
@@ -24,8 +24,11 @@ Unprivileged Package Manager
 %setup
 
 %build
-qmake-qt4 CONFIG-=debug CONFIG+=release PREFIX=/usr LIBDIR=%{_libdir}
-make
+cd DracoPKG/lib
+qmake-qt4 CONFIG+=release CONFIG+=libpkgsrc CONFIG+=staticlib PREFIX=$(pwd)/../build
+make install
+cd ../..
+qmake-qt4 CONFIG+=release CONFIG+=libpkgsrc PREFIX=/usr
 
 %install
 make INSTALL_ROOT=%{buildroot} install
